@@ -52,6 +52,10 @@ public final class WarExploder {
     @CheckForNull
     private static final String JENKINS_WAR_PATH = System.getProperty(JENKINS_WAR_PATH_PROPERTY_NAME);
 
+    public static boolean isUsingCustomWAR() {
+        return JENKINS_WAR_PATH != null;
+    }
+
     public static File getExplodedDir() throws Exception {
         // rethrow an exception every time someone tries to do this, so that when explode()
         // fails, you can see the cause no matter which test case you look at.

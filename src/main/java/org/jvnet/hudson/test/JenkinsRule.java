@@ -187,6 +187,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.security.Password;
+import org.eclipse.jetty.webapp.CachingWebAppClassLoader;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
@@ -666,7 +667,14 @@ public class JenkinsRule implements TestRule, MethodRule, RootAction {
         })));
 
         WebAppContext context = new WebAppContext(WarExploder.getExplodedDir().getPath(), contextPath);
-        context.setClassLoader(getClass().getClassLoader());
+        if (WarExploder.isUsingCustomWAR()) {
+            // We use CachingWebAppClassLoader as a primary, fallback to the JTH loader
+            ClassLoader wrappedClassLoader = new CachingWebAppClassLoader(getClass().getClassLoader(), context);
+            context.setClassLoader(wrappedClassLoader);
+        } else {
+            // Loading from dependencies and Maven environment
+            context.setClassLoader(getClass().getClassLoader());
+        }
         context.setConfigurations(new Configuration[]{new WebXmlConfiguration()});
         context.addBean(new NoListenerConfiguration(context));
         server.setHandler(context);

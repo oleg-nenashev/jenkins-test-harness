@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import hudson.model.UnprotectedRootAction;
 import hudson.model.User;
+import hudson.remoting.Which;
 import hudson.util.HttpResponses;
 import jenkins.security.ApiTokenProperty;
 import net.sf.json.JSONObject;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JenkinsRuleTest {
 
@@ -123,6 +125,12 @@ public class JenkinsRuleTest {
         wc = j.createWebClient();
         wc.withBasicApiToken("charlotte");
         makeRequestAndAssertLogin(wc, "charlotte");
+    }
+
+    @Test
+    public void shouldBeAbleToLoadTheRemotingResource() throws Exception {
+        assertNotNull(Which.jarFile(hudson.remoting.Launcher.class));
+        assertNotNull(j.jenkins.getJnlpJars("remoting.jar"));
     }
 
     private void makeRequestAndAssertLogin(JenkinsRule.WebClient wc, String expectedLogin) throws IOException, SAXException {
